@@ -192,3 +192,32 @@ class TagListAPIView(APIView):
             "total_tags": tags.count(),
             "tags": list(tags)
         })
+    
+
+class TagDetailAPIView(APIView):
+    """
+    Tag Detail API:
+    Returns all snippets linked to a specific tag.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, tag_id, *args, **kwargs):
+        try:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            return Response({"error": "Tag not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        snippets = tag.snippets.filter(created_by=request.user).prefetch_related("tags")
+        data = {
+            "tag": tag.title,
+            "total_snippets": snippets.count(),
+            "snippets": [
+                {
+                    "id": snippet.id,
+                    "title": snippet.title,
+                    "tags": [t.title for t in snippet.tags.all()],
+                }
+                for snippet in snippets
+            ]
+        }
+        return Response(data)

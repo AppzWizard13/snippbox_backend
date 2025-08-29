@@ -6,6 +6,7 @@ from .views import (
     SnippetUpdateAPIView,
     SnippetDeleteAPIView,
     TagListAPIView,
+    TagDetailAPIView,
 )
 
 urlpatterns = [
@@ -15,5 +16,7 @@ urlpatterns = [
     path("update/<int:snippet_id>/", SnippetUpdateAPIView.as_view(), name="snippet-update"),
     path("delete/", SnippetDeleteAPIView.as_view(), name="snippet-delete"),
     path("tags/", TagListAPIView.as_view(), name="tag-list"),
+    path('tags/<int:tag_id>/', TagDetailAPIView.as_view(), name='tag-detail'),
+
 
 ]
