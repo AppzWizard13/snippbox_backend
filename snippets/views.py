@@ -87,3 +87,55 @@ class SnippetDetailAPIView(APIView):
             "created_at": snippet.created_at,
             "updated_at": snippet.updated_at,
         }, status=status.HTTP_200_OK)
+    
+class SnippetUpdateAPIView(APIView):
+    """
+    Update API:
+    Update a snippet's title, note, and tags.
+    Only the creator can update their snippet.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, snippet_id, *args, **kwargs):
+        try:
+            snippet = Snippet.objects.get(id=snippet_id, created_by=request.user)
+        except Snippet.DoesNotExist:
+            return Response(
+                {"error": "Snippet not found or you don't have permission to update it."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        title = request.data.get("title")
+        note = request.data.get("note")
+        tag_titles = request.data.get("tags")
+
+        if not any([title, note, tag_titles]):
+            return Response(
+                {"error": "At least one field (title, note, or tags) must be provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if title:
+            snippet.title = title
+        if note:
+            snippet.note = note
+
+        # Update tags if provided
+        if tag_titles is not None:
+            tags = []
+            for tag_title in tag_titles:
+                tag, _ = Tag.objects.get_or_create(title=tag_title)
+                tags.append(tag)
+            snippet.tags.set(tags)
+
+        snippet.save()
+
+        return Response({
+            "id": snippet.id,
+            "title": snippet.title,
+            "note": snippet.note,
+            "tags": [tag.title for tag in snippet.tags.all()],
+            "created_by": snippet.created_by.username,
+            "created_at": snippet.created_at,
+            "updated_at": snippet.updated_at,
+        }, status=status.HTTP_200_OK)
