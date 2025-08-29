@@ -177,3 +177,18 @@ class SnippetDeleteAPIView(APIView):
             ]
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class TagListAPIView(APIView):
+    """
+    Tag List API:
+    Returns a list of all tags.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        tags = Tag.objects.all().values("id", "title")
+        return Response({
+            "total_tags": tags.count(),
+            "tags": list(tags)
+        })
