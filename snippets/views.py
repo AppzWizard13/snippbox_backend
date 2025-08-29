@@ -1,29 +1,68 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
+from rest_framework import status
 
-from .models import Snippet
+from .models import Snippet, Tag
 
 
 class SnippetOverviewAPIView(APIView):
     """
     Overview API:
-    Returns total count of snippets created by the user,
-    along with a list of snippets and their detail links.
+    Returns total count of user's snippets along with a list of snippets.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        snippets = Snippet.objects.filter(created_by=request.user).only("id", "title")
-
-        return Response({
+        snippets = Snippet.objects.filter(created_by=request.user).prefetch_related("tags")
+        data = {
             "total_snippets": snippets.count(),
             "snippets": [
                 {
                     "id": snippet.id,
                     "title": snippet.title,
+                    "tags": [tag.title for tag in snippet.tags.all()],
                 }
                 for snippet in snippets
             ]
-        })
+        }
+        return Response(data)
+
+
+class SnippetCreateAPIView(APIView):
+    """
+    Create API:
+    Create a snippet with title, note, and tags. Reuses tags if they exist.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        title = request.data.get("title")
+        note = request.data.get("note")
+        tag_titles = request.data.get("tags")  
+
+        if not all([title, note, tag_titles]):
+            return Response(
+                {"error": "title, note, and tags are required fields."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Create snippet first
+        snippet = Snippet.objects.create(title=title, note=note, created_by=request.user)
+
+        # Handle multiple tags
+        tags = []
+        for tag_title in tag_titles:
+            tag, _ = Tag.objects.get_or_create(title=tag_title)
+            tags.append(tag)
+        snippet.tags.set(tags) 
+
+        return Response({
+            "id": snippet.id,
+            "title": snippet.title,
+            "note": snippet.note,
+            "tags": [tag.title for tag in snippet.tags.all()],
+            "created_by": snippet.created_by.username,
+            "created_at": snippet.created_at,
+            "updated_at": snippet.updated_at,
+        }, status=status.HTTP_201_CREATED)
