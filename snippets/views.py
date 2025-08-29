@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
+
 
 from .models import Snippet, Tag
 
@@ -66,3 +68,22 @@ class SnippetCreateAPIView(APIView):
             "created_at": snippet.created_at,
             "updated_at": snippet.updated_at,
         }, status=status.HTTP_201_CREATED)
+
+class SnippetDetailAPIView(APIView):
+    """
+    Detail API:
+    Returns the details of a single snippet belonging to the authenticated user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, snippet_id, *args, **kwargs):
+        snippet = get_object_or_404(Snippet, id=snippet_id, created_by=request.user)
+        return Response({
+            "id": snippet.id,
+            "title": snippet.title,
+            "note": snippet.note,
+            "tags": [tag.title for tag in snippet.tags.all()],
+            "created_by": snippet.created_by.username,
+            "created_at": snippet.created_at,
+            "updated_at": snippet.updated_at,
+        }, status=status.HTTP_200_OK)
