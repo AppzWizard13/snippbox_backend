@@ -139,3 +139,41 @@ class SnippetUpdateAPIView(APIView):
             "created_at": snippet.created_at,
             "updated_at": snippet.updated_at,
         }, status=status.HTTP_200_OK)
+     
+
+class SnippetDeleteAPIView(APIView):
+    """
+    Delete selected snippets and return the list of all available
+    snippets created by the current user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        snippet_ids = request.data.get("snippet_ids", [])
+
+        if not snippet_ids:
+            return Response(
+                {"error": "No snippet IDs provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Filter snippets that belong to the current user
+        snippets_to_delete = Snippet.objects.filter(id__in=snippet_ids, created_by=request.user)
+        deleted_count = snippets_to_delete.count()
+        snippets_to_delete.delete()
+
+        # Return updated list of snippets
+        snippets = Snippet.objects.filter(created_by=request.user).prefetch_related("tags")
+        data = {
+            "deleted_count": deleted_count,
+            "total_snippets": snippets.count(),
+            "snippets": [
+                {
+                    "id": s.id,
+                    "title": s.title,
+                    "tags": [tag.title for tag in s.tags.all()],
+                }
+                for s in snippets
+            ]
+        }
+        return Response(data, status=status.HTTP_200_OK)
