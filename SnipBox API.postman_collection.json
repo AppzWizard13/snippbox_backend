@@ -1,0 +1,278 @@
+{
+	"info": {
+		"_postman_id": "9c5a54e6-f686-4434-93b5-8ee866ef3f17",
+		"name": "SnipBox API",
+		"description": "Postman collection for SnipBox Django API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28838154"
+	},
+	"item": [
+		{
+			"name": "Obtain JWT Token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpassword\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/token/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh JWT Token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"refresh\": \"<your_refresh_token_here>\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/token/refresh/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"token",
+						"refresh",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Snippet Overview",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <your_access_token>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/overview/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"overview",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Snippet",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <your_access_token>"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Example Snippet\",\n  \"code\": \"print('Hello World')\",\n  \"tags\": [1,2]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/create/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"create",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Snippet Detail",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <your_access_token>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/detail/1/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"detail",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Snippet",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2NTU0ODM4LCJpYXQiOjE3NTY1NTExOTQsImp0aSI6IjA3NDIxMTgxZGMzMzRiYWRhYzk3OWViZTMxNTJiNmIxIiwidXNlcl9pZCI6MX0.9PlL2fEaq1VN_JCBSL_XKuRCw79baRomQxdB_4YSf5k"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Updated Snippet\",\n  \"note\": \"print('\\''Updated Code'\\'')\",\n  \"tags\": [\"Python\"]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/update/1/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"update",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Snippet",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <your_access_token>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/delete/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"delete",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tag List",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <your_access_token>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/tags/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"tags",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tag Detail",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <your_access_token>"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/snippets/tags/1/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"snippets",
+						"tags",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
